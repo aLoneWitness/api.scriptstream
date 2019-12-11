@@ -5,10 +5,7 @@ import scriptstream.networking.decoding.ChatMessageDecoder;
 import scriptstream.networking.encoding.ChatMessageEncoder;
 import scriptstream.networking.entities.ChatMessage;
 
-import javax.websocket.EncodeException;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
+import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -61,5 +58,10 @@ public class ChatEndpoint {
                 e.printStackTrace();
             }
         });
+    }
+
+    @OnClose
+    public void onClose(Session session, @PathParam("projectuuid") String projectuuid) throws IOException {
+        projectSessions.get(UUID.fromString(projectuuid)).remove(session);
     }
 }
