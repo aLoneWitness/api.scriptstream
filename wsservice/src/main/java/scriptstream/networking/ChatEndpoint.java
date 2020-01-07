@@ -1,5 +1,6 @@
 package scriptstream.networking;
 
+import okhttp3.*;
 import scriptstream.entities.User;
 import scriptstream.networking.decoding.ChatMessageDecoder;
 import scriptstream.networking.encoding.ChatMessageEncoder;
@@ -9,16 +10,39 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.util.*;
 
 @ServerEndpoint(value = "/chat/{projectuuid}", decoders = ChatMessageDecoder.class, encoders = ChatMessageEncoder.class )
 public class ChatEndpoint {
     private static Map<UUID, List<Session>> projectSessions = new HashMap<UUID, List<Session>>();
     private static HashMap<String, User> users = new HashMap<String, User>();
+    private final OkHttpClient httpClient = new OkHttpClient();
 
 
     @OnOpen
     public void onOpen(Session session, @PathParam("projectuuid") String projectuuid) throws IOException {
+        User user = new User();
+        user.setName("Hallo jumbo");
+
+//        RequestBody formBody = new FormBody.Builder()
+//                .add("gToken", gtoken)
+//                .build();
+//
+//        Request request = new Request.Builder()
+//                .url("localhost:2000/rest")
+//                .addHeader("User-Agent", "WebsocketServer")
+//                .post(formBody)
+//                .build();
+//
+//        try(Response response = httpClient.newCall(request).execute()) {
+//            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+//            user.setName("Lmao");
+//        }
+
+
         UUID uuid = UUID.fromString(projectuuid);
         System.out.println(uuid);
         if(projectSessions.containsKey(UUID.fromString(projectuuid))){
@@ -30,8 +54,6 @@ public class ChatEndpoint {
             projectSessions.put(UUID.fromString(projectuuid), sessions);
         }
 
-        User user = new User();
-        user.setName("Mark");
 
         users.put(session.getId(), user);
 

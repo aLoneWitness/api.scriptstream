@@ -1,4 +1,4 @@
-package entities;
+package scriptstream.entities;
 
 import lombok.Getter;
 import lombok.Setter;

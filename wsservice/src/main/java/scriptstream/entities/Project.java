@@ -1,16 +1,21 @@
-package entities;
+package scriptstream.entities;
 
 import lombok.Getter;
-import lombok.Setter;
 
-import javax.persistence.Entity;
 import java.util.List;
 import java.util.UUID;
 
-@Entity @Getter @Setter
 public class Project {
+    @Getter
     private User owner;
+    @Getter
     private List<User> contributers;
+    @Getter
     private List<Skill> requiredSkills;
+    @Getter
     private UUID uuid = UUID.randomUUID();
+
+    public Project(User owner){
+        this.owner = owner;
+    }
 }
