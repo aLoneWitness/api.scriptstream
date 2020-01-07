@@ -1,7 +1,6 @@
 package scriptstream.networking;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import okhttp3.*;
 import scriptstream.entities.User;
 import scriptstream.networking.decoding.ChatMessageDecoder;
@@ -12,9 +11,6 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.util.*;
 
 @ServerEndpoint(value = "/chat/{projectuuid}/{gtoken}", decoders = ChatMessageDecoder.class, encoders = ChatMessageEncoder.class )
