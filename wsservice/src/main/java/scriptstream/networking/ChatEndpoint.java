@@ -1,5 +1,7 @@
 package scriptstream.networking;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import okhttp3.*;
 import scriptstream.entities.User;
 import scriptstream.networking.decoding.ChatMessageDecoder;
@@ -15,32 +17,31 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.util.*;
 
-@ServerEndpoint(value = "/chat/{projectuuid}", decoders = ChatMessageDecoder.class, encoders = ChatMessageEncoder.class )
+@ServerEndpoint(value = "/chat/{projectuuid}/{gtoken}", decoders = ChatMessageDecoder.class, encoders = ChatMessageEncoder.class )
 public class ChatEndpoint {
     private static Map<UUID, List<Session>> projectSessions = new HashMap<UUID, List<Session>>();
     private static HashMap<String, User> users = new HashMap<String, User>();
     private final OkHttpClient httpClient = new OkHttpClient();
+    private final Gson gson = new Gson();
 
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("projectuuid") String projectuuid) throws IOException {
+    public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("gtoken") String gtoken) throws IOException {
         User user = new User();
-        user.setName("Hallo jumbo");
+        user.setGToken(gtoken);
 
-//        RequestBody formBody = new FormBody.Builder()
-//                .add("gToken", gtoken)
-//                .build();
-//
-//        Request request = new Request.Builder()
-//                .url("localhost:2000/rest")
-//                .addHeader("User-Agent", "WebsocketServer")
-//                .post(formBody)
-//                .build();
-//
-//        try(Response response = httpClient.newCall(request).execute()) {
-//            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-//            user.setName("Lmao");
-//        }
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(user));
+
+        Request request = new Request.Builder()
+                .url("http://localhost:2000/rest/auth/login")
+                .post(requestBody)
+                .build();
+
+        try(Response response = httpClient.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+            user = gson.fromJson(response.body().string(), User.class);
+            user.setName(user.getName());
+        }
 
 
         UUID uuid = UUID.fromString(projectuuid);

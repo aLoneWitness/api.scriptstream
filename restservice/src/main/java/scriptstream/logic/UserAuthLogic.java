@@ -20,8 +20,12 @@ public class UserAuthLogic {
 
     public boolean register(User user){
         try {
-            GoogleIdToken idToken = verifier.verify(user.getGToken());
-            if(idToken.verify(verifier)) return true;
+            GoogleIdToken idToken = verifier.verify(user.gToken);
+            if(idToken.verify(verifier)) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                user.name = (String) payload.get("name");
+                return true;
+            }
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
         }
