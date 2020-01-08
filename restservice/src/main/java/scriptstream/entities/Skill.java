@@ -1,16 +1,13 @@
 package scriptstream.entities;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 import lombok.Getter;
 
-@DatabaseTable(tableName = "skills")
-public class Skill {
-    @DatabaseField(id = true)
-    public int id;
-    @DatabaseField
-    public String name;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-    @Getter @DatabaseField
+public class Skill {
+    public int id;
+    public String name;
     public int sPercentage;
 }

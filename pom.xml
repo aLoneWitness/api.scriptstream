@@ -11,6 +11,7 @@
     <modules>
         <module>wsservice</module>
         <module>restservice</module>
+        <module>matchmakingservice</module>
     </modules>
 
     <dependencies>

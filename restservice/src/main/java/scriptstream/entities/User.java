@@ -1,22 +1,21 @@
 package scriptstream.entities;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
-import lombok.Getter;
-import lombok.Setter;
+
+import net.sf.jeasyorm.annotation.Column;
+import net.sf.jeasyorm.annotation.Table;
 
 import java.util.List;
 import java.util.UUID;
 
-@DatabaseTable(tableName = "users")
+@Table(schema = "scriptstream", name = "user")
 public class User {
-    @DatabaseField
-    public int id;
-    @Getter @DatabaseField
+    @Column(name = "UUID")
+    public UUID uuid;
+    @Column(name = "name")
     public String name;
-    @DatabaseField
+    @Column(name = "gToken")
     public String gToken;
-    @DatabaseField
+
     public List<Skill> skills;
 
     public boolean hasSkill(Skill skill){

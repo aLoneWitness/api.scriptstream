@@ -15,9 +15,13 @@ import javax.ws.rs.core.Response;
 
 @Path("auth")
 public class UserAuthService {
-//    private @Inject UserAuthLogic userAuthLogic;
-    private UserAuthLogic userAuthLogic = new UserAuthLogic();
+    private UserAuthLogic userAuthLogic;
     private final Gson gson = new Gson();
+
+    @Inject
+    public UserAuthService(UserAuthLogic userAuthLogic){
+        this.userAuthLogic = userAuthLogic;
+    }
 
     @POST
     @Path("/login")

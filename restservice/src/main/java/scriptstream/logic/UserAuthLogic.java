@@ -24,6 +24,7 @@ public class UserAuthLogic {
             if(idToken.verify(verifier)) {
                 GoogleIdToken.Payload payload = idToken.getPayload();
                 user.name = (String) payload.get("name");
+//                PersistencyManager.getEntityManager().insert(user);
                 return true;
             }
         } catch (GeneralSecurityException | IOException e) {

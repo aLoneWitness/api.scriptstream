@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="restservice" />
         <module name="wsservice" />
+        <module name="matchmakingservice" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11">

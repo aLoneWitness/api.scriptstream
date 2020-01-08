@@ -3,10 +3,12 @@ package scriptstream.networking;
 import com.google.gson.Gson;
 import okhttp3.*;
 import scriptstream.entities.User;
+import scriptstream.logic.UserVerificationLogic;
 import scriptstream.networking.decoding.ChatMessageDecoder;
 import scriptstream.networking.encoding.ChatMessageEncoder;
 import scriptstream.networking.entities.ChatMessage;
 
+import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
@@ -17,28 +19,22 @@ import java.util.*;
 public class ChatEndpoint {
     private static Map<UUID, List<Session>> projectSessions = new HashMap<UUID, List<Session>>();
     private static HashMap<String, User> users = new HashMap<String, User>();
-    private final OkHttpClient httpClient = new OkHttpClient();
     private final Gson gson = new Gson();
-
+    private UserVerificationLogic verificationLogic = new UserVerificationLogic();
 
     @OnOpen
     public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("gtoken") String gtoken) throws IOException {
         User user = new User();
         user.setGToken(gtoken);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(user));
-
-        Request request = new Request.Builder()
-                .url("http://localhost:2000/rest/auth/login")
-                .post(requestBody)
-                .build();
-
-        try(Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-            user = gson.fromJson(response.body().string(), User.class);
-            user.setName(user.getName());
+        try{
+            user = verificationLogic.verify(user);
         }
+        catch (IOException e) {
 
+            session.close();
+            return;
+        }
 
         UUID uuid = UUID.fromString(projectuuid);
         System.out.println(uuid);
