@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 
 import org.glassfish.tyrus.server.Server;
 import scriptstream.networking.ChatEndpoint;
+import scriptstream.networking.CodeStreamEndpoint;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,7 +13,7 @@ public class Main {
     }
 
     public static void runServer() {
-        Server server = new Server("localhost", 8025, "/websockets", ChatEndpoint.class);
+        Server server = new Server("localhost", 8025, "/websockets", ChatEndpoint.class, CodeStreamEndpoint.class);
 
         try {
             server.start();

@@ -1,5 +1,15 @@
 package scriptstream.networking.entities;
 
-public class CodeStreamMessage {
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter @Setter
+public class CodeStreamMessage {
+    private String from;
+    private String content;
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

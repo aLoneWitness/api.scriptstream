@@ -3,24 +3,24 @@ package scriptstream.networking;
 import com.google.gson.Gson;
 import okhttp3.*;
 import scriptstream.entities.User;
+import scriptstream.logic.UserVerificationLogic;
+import scriptstream.networking.decoding.CodeStreamMessageDecoder;
+import scriptstream.networking.encoding.CodeStreamMessageEncoder;
+import scriptstream.networking.entities.ChatMessage;
+import scriptstream.networking.entities.CodeStreamMessage;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
+import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-@ServerEndpoint("/codestream/{projectuuid}/{gtoken}")
+@ServerEndpoint(value = "/codestream/{projectuuid}/{gtoken}", decoders = CodeStreamMessageDecoder.class, encoders = CodeStreamMessageEncoder.class)
 public class CodeStreamEndpoint {
     private static Map<UUID, List<Session>> projectSessions = new HashMap<UUID, List<Session>>();
     private static HashMap<String, User> users = new HashMap<String, User>();
 
-    private final OkHttpClient httpClient = new OkHttpClient();
+    private UserVerificationLogic verificationLogic = new UserVerificationLogic();
     private final Gson gson = new Gson();
 
     @OnOpen
@@ -28,28 +28,48 @@ public class CodeStreamEndpoint {
         User user = new User();
         user.setGToken(gtoken);
 
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), gson.toJson(user));
-
-        Request request = new Request.Builder()
-                .url("http://localhost:2000/rest/auth/login")
-                .post(requestBody)
-                .build();
-
-        try(Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-            user = gson.fromJson(response.body().string(), User.class);
-            user.setName(user.getName());
+        try{
+            user = verificationLogic.verify(user);
         }
-        catch(IOException e){
+        catch (IOException e) {
+
             session.close();
+            return;
         }
+
+        UUID uuid = UUID.fromString(projectuuid);
+        System.out.println(uuid);
+        if(projectSessions.containsKey(UUID.fromString(projectuuid))){
+            projectSessions.get(UUID.fromString(projectuuid)).add(session);
+        }
+        else{
+            List<Session> sessions = new ArrayList<>();
+            sessions.add(session);
+            projectSessions.put(UUID.fromString(projectuuid), sessions);
+        }
+
+
+        users.put(session.getId(), user);
 
 
     }
 
-    @OnClose
-    public void onClose(Session session){
+    @OnMessage
+    public void onMessage(Session session, CodeStreamMessage message, @PathParam("projectuuid") String projectuuid) throws IOException {
+        message.setFrom(users.get(session.getId()).getName());
+        System.out.println(session.getId());
+        projectSessions.get(UUID.fromString(projectuuid)).forEach(session1 -> {
+            try {
+                session1.getBasicRemote().sendObject(message);
+            } catch (IOException | EncodeException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
+    @OnClose
+    public void onClose(Session session, @PathParam("projectuuid") String projectuuid){
+        projectSessions.get(UUID.fromString(projectuuid)).remove(session);
     }
 
 }
