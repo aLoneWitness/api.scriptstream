@@ -28,7 +28,7 @@ public class UserAuthService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response login(User user) {
-        if(userAuthLogic.register(user)){
+        if(userAuthLogic.login(user)){
             return Response.ok(gson.toJson(user), MediaType.APPLICATION_JSON).build();
         }
         return Response.status(400).build();

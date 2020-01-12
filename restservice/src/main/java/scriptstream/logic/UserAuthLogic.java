@@ -18,7 +18,7 @@ public class UserAuthLogic {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory()).setAudience(Collections.singletonList(CLIENT_ID)).build();
     }
 
-    public boolean register(User user){
+    public boolean login(User user){
         try {
             GoogleIdToken idToken = verifier.verify(user.gToken);
             if(idToken.verify(verifier)) {
