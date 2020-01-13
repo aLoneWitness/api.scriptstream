@@ -26,7 +26,7 @@ public class UserService {
     @POST
     @Path("addskill")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addSkill(User user, Skill skill){
+    public Response addSkill(Skill skill){
 
     }
 

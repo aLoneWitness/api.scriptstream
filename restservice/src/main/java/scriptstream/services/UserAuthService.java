@@ -10,8 +10,15 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 @Path("auth")
 public class UserAuthService {
@@ -26,11 +33,15 @@ public class UserAuthService {
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response login(User user) {
-        if(userAuthLogic.login(user)){
-            return Response.ok(gson.toJson(user), MediaType.APPLICATION_JSON).build();
+        try {
+            String token = userAuthLogic.login(user);
+            return Response.ok().header(AUTHORIZATION, "Bearer " + token).build();
         }
-        return Response.status(400).build();
+        catch (Exception e) {
+            return Response.status(UNAUTHORIZED).build();
+        }
+
+
     }
 }
