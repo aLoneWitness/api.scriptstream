@@ -41,7 +41,5 @@ public class UserAuthService {
         catch (Exception e) {
             return Response.status(UNAUTHORIZED).build();
         }
-
-
     }
 }

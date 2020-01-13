@@ -33,7 +33,7 @@ public class UserAuthLogic {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory()).setAudience(Collections.singletonList(CLIENT_ID)).build();
 
         try {
-            this.keyGenerator = KeyGenerator.getInstance("AES (128)");
+            this.keyGenerator = KeyGenerator.getInstance("HmacSHA256");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -65,7 +65,7 @@ public class UserAuthLogic {
                     .setIssuer(InetAddress.getLocalHost().toString())
                     .setIssuedAt(now)
                     .setExpiration(expDate)
-                    .signWith(SignatureAlgorithm.HS512, key)
+                    .signWith(SignatureAlgorithm.HS256, key)
                     .compact();
         }
         catch (UnknownHostException e){

@@ -3,6 +3,7 @@ package scriptstream.services;
 import com.google.gson.Gson;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
+import scriptstream.filters.JWTTokenNeeded;
 import scriptstream.logic.MatchmakingLogic;
 import scriptstream.logic.UserAuthLogic;
 
@@ -26,8 +27,9 @@ public class UserService {
     @POST
     @Path("addskill")
     @Consumes(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
     public Response addSkill(Skill skill){
-
+        return Response.ok().build();
     }
 
     @POST
@@ -42,6 +44,7 @@ public class UserService {
     @Path("getmatchedprojects")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
     public Response getMatchedProjects(User user){
         return Response.ok(gson.toJson(matchmakingLogic.getMatchedProjects(user))).build();
     }

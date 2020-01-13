@@ -23,7 +23,7 @@ public class JWTTokenNeededFilter implements ContainerRequestFilter {
 
     public JWTTokenNeededFilter() {
         try {
-            this.keyGenerator = KeyGenerator.getInstance("AES (128)");
+            this.keyGenerator = KeyGenerator.getInstance("HmacSHA256");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -31,16 +31,19 @@ public class JWTTokenNeededFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        String authHeader = containerRequestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-
-        String token = authHeader.substring("Bearer".length()).trim();
-
         try {
-            Key key = keyGenerator.generateKey();
-            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-            System.out.println("#### VALID TOKEN : " + token);
-        } catch (Exception e) {
-            System.out.println("#### INVALID TOKEN : " + token);
+            String authHeader = containerRequestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+            String token = authHeader.substring("Bearer".length()).trim();
+            try {
+                Key key = keyGenerator.generateKey();
+                Jwts.parser().setSigningKey(key).parseClaimsJws(token);
+                System.out.println("#### VALID TOKEN : " + token);
+            } catch (Exception e) {
+                System.out.println("#### INVALID TOKEN : " + token);
+                containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+            }
+        }catch (Exception e) {
+            System.out.println("#### NO TOKEN PRESENT WHEN ATTEMPTED AUTHENTICATION REQUEST");
             containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }
