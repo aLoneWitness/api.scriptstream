@@ -1,9 +1,11 @@
 package scriptstream.filters;
 
 import io.jsonwebtoken.Jwts;
+import scriptstream.util.EncryptionManager;
 
 import javax.annotation.Priority;
 import javax.crypto.KeyGenerator;
+import javax.inject.Inject;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -19,14 +21,12 @@ import java.security.NoSuchAlgorithmException;
 @Priority(Priorities.AUTHENTICATION)
 public class JWTTokenNeededFilter implements ContainerRequestFilter {
 
-    private KeyGenerator keyGenerator;
 
-    public JWTTokenNeededFilter() {
-        try {
-            this.keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+    private EncryptionManager encryptionManager;
+
+    @Inject
+    public JWTTokenNeededFilter(EncryptionManager encryptionManager) {
+        this.encryptionManager = encryptionManager;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class JWTTokenNeededFilter implements ContainerRequestFilter {
             String authHeader = containerRequestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
             String token = authHeader.substring("Bearer".length()).trim();
             try {
-                Key key = keyGenerator.generateKey();
+                Key key = encryptionManager.getEncryptionKey();
                 Jwts.parser().setSigningKey(key).parseClaimsJws(token);
                 System.out.println("#### VALID TOKEN : " + token);
             } catch (Exception e) {

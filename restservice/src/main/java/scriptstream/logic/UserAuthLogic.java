@@ -8,6 +8,7 @@ import com.google.api.client.util.DateTime;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import scriptstream.entities.User;
+import scriptstream.util.EncryptionManager;
 
 import javax.crypto.KeyGenerator;
 import javax.ws.rs.core.UriInfo;
@@ -17,9 +18,11 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 
@@ -27,16 +30,11 @@ public class UserAuthLogic {
     private final String CLIENT_ID = "156633696944-p3ud87unloob34dobt770plf00hliqhu.apps.googleusercontent.com";
     private GoogleIdTokenVerifier verifier;
 
-    private KeyGenerator keyGenerator;
+    private EncryptionManager encryptionManager;
 
-    public UserAuthLogic() {
+    public UserAuthLogic(EncryptionManager encryptionManager) {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory()).setAudience(Collections.singletonList(CLIENT_ID)).build();
-
-        try {
-            this.keyGenerator = KeyGenerator.getInstance("HmacSHA256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        this.encryptionManager = encryptionManager;
     }
 
     public String login(User user) {
@@ -56,15 +54,16 @@ public class UserAuthLogic {
 
     private String issueToken(String login) {
         try{
-            Key key = keyGenerator.generateKey();
-            Date now = new Date();
-            Date expDate = Date.from(LocalDateTime.now().plusMinutes(15).ofInstant(now.toInstant(), ZoneId.systemDefault()).atZone(ZoneId.systemDefault()).toInstant());
+            Key key = encryptionManager.getEncryptionKey();
+
+            Instant issuedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            Instant expiration = issuedAt.plus(15, ChronoUnit.MINUTES);
 
             return Jwts.builder()
                     .setSubject(login)
                     .setIssuer(InetAddress.getLocalHost().toString())
-                    .setIssuedAt(now)
-                    .setExpiration(expDate)
+                    .setIssuedAt(Date.from(issuedAt))
+                    .setExpiration(Date.from(expiration))
                     .signWith(SignatureAlgorithm.HS256, key)
                     .compact();
         }
