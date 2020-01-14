@@ -1,6 +1,7 @@
 package scriptstream.services;
 
 import com.google.gson.Gson;
+import org.apache.http.protocol.ResponseServer;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
 import scriptstream.filters.JWTTokenNeeded;
@@ -9,8 +10,11 @@ import scriptstream.logic.UserAuthLogic;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.UUID;
 
 @Path("user")
 public class UserService {
@@ -24,6 +28,15 @@ public class UserService {
         this.userAuthLogic = userAuthLogic;
     }
 
+    @GET
+    @Path("getprofile")
+    @JWTTokenNeeded
+    public Response getProfile(@Context ContainerRequestContext context){
+        User user = userAuthLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+
+        return Response.ok(gson.toJson(user)).build();
+    }
+
     @POST
     @Path("addskill")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -33,19 +46,19 @@ public class UserService {
     }
 
     @POST
-    @Path("matchuser")
+    @Path("match")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response matchUser(User user){
+    public Response matchUser(@Context ContainerRequestContext context){
+        User user = userAuthLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
         return Response.ok(gson.toJson(matchmakingLogic.match(user))).build();
     }
 
-    @POST
-    @Path("getmatchedprojects")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Path("getprojects")
     @JWTTokenNeeded
-    public Response getMatchedProjects(User user){
+    public Response getMatchedProjects(@Context ContainerRequestContext context){
+        User user = userAuthLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
         return Response.ok(gson.toJson(matchmakingLogic.getMatchedProjects(user))).build();
     }
 }

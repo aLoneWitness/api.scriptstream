@@ -1,21 +1,19 @@
 package scriptstream.networking;
 
 import com.google.gson.Gson;
-import okhttp3.*;
 import scriptstream.entities.User;
 import scriptstream.logic.UserVerificationLogic;
 import scriptstream.networking.decoding.ChatMessageDecoder;
 import scriptstream.networking.encoding.ChatMessageEncoder;
 import scriptstream.networking.entities.ChatMessage;
 
-import javax.inject.Inject;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
 
-@ServerEndpoint(value = "/chat/{projectuuid}/{gtoken}", decoders = ChatMessageDecoder.class, encoders = ChatMessageEncoder.class )
+@ServerEndpoint(value = "/chat/{projectuuid}/{jwt}", decoders = ChatMessageDecoder.class, encoders = ChatMessageEncoder.class )
 public class ChatEndpoint {
     private static Map<UUID, List<Session>> projectSessions = new HashMap<UUID, List<Session>>();
     private static HashMap<String, User> users = new HashMap<String, User>();
@@ -23,18 +21,10 @@ public class ChatEndpoint {
     private UserVerificationLogic verificationLogic = new UserVerificationLogic();
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("gtoken") String gtoken) throws IOException {
-        User user = new User();
-        user.setGToken(gtoken);
+    public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("jwt") String jwt) throws IOException {
+        User user;
+        user = verificationLogic.getUser(jwt);
 
-        try{
-            user = verificationLogic.verify(user);
-        }
-        catch (IOException e) {
-
-            session.close();
-            return;
-        }
 
         UUID uuid = UUID.fromString(projectuuid);
         System.out.println(uuid);
@@ -46,6 +36,7 @@ public class ChatEndpoint {
             sessions.add(session);
             projectSessions.put(UUID.fromString(projectuuid), sessions);
         }
+
 
 
         users.put(session.getId(), user);

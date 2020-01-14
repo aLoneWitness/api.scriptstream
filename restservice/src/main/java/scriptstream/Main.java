@@ -4,6 +4,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import scriptstream.binders.DIBinder;
+import scriptstream.filters.CORSFilter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,6 +28,8 @@ public class Main {
 
         final ResourceConfig rc = new ResourceConfig().packages("scriptstream")
                 .register(new DIBinder());
+        rc.property("jersey.config.server.wadl.disableWadl", true);
+
 
         // create and start a new instance of grizzly http server
         // exposing the Jersey application at BASE_URI
