@@ -15,7 +15,7 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
 
-@ServerEndpoint(value = "/codestream/{projectuuid}/{gtoken}", decoders = CodeStreamMessageDecoder.class, encoders = CodeStreamMessageEncoder.class)
+@ServerEndpoint(value = "/codestream/{projectuuid}/{jwt}", decoders = CodeStreamMessageDecoder.class, encoders = CodeStreamMessageEncoder.class)
 public class CodeStreamEndpoint {
     private static Map<UUID, List<Session>> projectSessions = new HashMap<UUID, List<Session>>();
     private static HashMap<String, User> users = new HashMap<String, User>();
@@ -24,18 +24,10 @@ public class CodeStreamEndpoint {
     private final Gson gson = new Gson();
 
     @OnOpen
-    public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("gtoken") String gtoken) throws IOException {
-        User user = new User();
-        user.setGToken(gtoken);
+    public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("jwt") String jwt) throws IOException {
 
-        try{
-            user = verificationLogic.verify(user);
-        }
-        catch (IOException e) {
+        User user = verificationLogic.getUser(jwt);
 
-            session.close();
-            return;
-        }
 
         UUID uuid = UUID.fromString(projectuuid);
         System.out.println(uuid);
