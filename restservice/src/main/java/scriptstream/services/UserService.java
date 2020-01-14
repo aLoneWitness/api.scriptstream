@@ -11,6 +11,7 @@ import scriptstream.logic.UserAuthLogic;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,8 +42,18 @@ public class UserService {
     @Path("addskill")
     @Consumes(MediaType.APPLICATION_JSON)
     @JWTTokenNeeded
-    public Response addSkill(Skill skill){
+    public Response addSkill(@Context ContainerRequestContext context, Skill skill){
+        User user = userAuthLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        user.skills.add(skill);
         return Response.ok().build();
+    }
+
+    @GET
+    @Path("getskills")
+    @JWTTokenNeeded
+    public Response getSkills(@Context ContainerRequestContext context){
+        User user = userAuthLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        return Response.ok(gson.toJson(user.skills)).build();
     }
 
     @POST

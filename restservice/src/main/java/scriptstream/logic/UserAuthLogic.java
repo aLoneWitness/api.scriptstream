@@ -40,6 +40,9 @@ public class UserAuthLogic {
     public UserAuthLogic(EncryptionManager encryptionManager) {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory()).setAudience(Collections.singletonList(CLIENT_ID)).build();
         this.encryptionManager = encryptionManager;
+
+        System.out.println("DEVELOPMENT TOKEN:");
+        System.out.println(issueToken("lol"));
     }
 
     public Pair<String, User> login(User user) {

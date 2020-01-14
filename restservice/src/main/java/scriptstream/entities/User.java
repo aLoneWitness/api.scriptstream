@@ -2,6 +2,7 @@ package scriptstream.entities;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,7 +11,7 @@ public class User {
     public String name;
     public String gToken;
 
-    public List<Skill> skills;
+    public List<Skill> skills = new ArrayList<Skill>();
 
     public boolean hasSkill(Skill skill){
         for (Skill mySkill : this.skills){
