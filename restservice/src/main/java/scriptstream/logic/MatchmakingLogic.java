@@ -35,7 +35,7 @@ public class MatchmakingLogic {
     }
 
     public Pair<Project, Integer> match(User user) {
-        Pair<Project, Integer> bestProjectForUser = new Pair<>(new Project(), 0);
+        Pair<Project, Integer> bestProjectForUser = new Pair<>(null, 0);
         for (Project project: this.projects) {
             int matchPercentage = getMatchPercentage(project, user);
             if(matchPercentage > bestProjectForUser.getValue()){

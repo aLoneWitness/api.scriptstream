@@ -17,7 +17,7 @@ public class User {
 
     public boolean hasSkill(Skill skill){
         for (Skill mySkill : this.skills){
-            if(skill.equals(mySkill)){
+            if(mySkill.equals(skill)){
                 return true;
             }
         }
