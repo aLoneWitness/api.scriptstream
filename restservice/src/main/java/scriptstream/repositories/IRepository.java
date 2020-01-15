@@ -1,5 +1,7 @@
 package scriptstream.repositories;
 
+import java.util.UUID;
+
 public interface IRepository<T> {
     void create(T t);
     T read(T t);

@@ -2,11 +2,13 @@ package scriptstream.entities;
 
 
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class User {
+    public int id;
     public UUID uuid;
     public String name;
     public String gToken;

@@ -38,7 +38,7 @@ public class AuthService {
 
     @POST
     @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(APPLICATION_JSON)
     public Response login(User user) {
         try {
             Pair<String, User> jwtUserPair = userAuthLogic.login(user);

@@ -8,13 +8,16 @@ import com.google.api.client.util.DateTime;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import javafx.util.Pair;
+import javafx.util.converter.BigIntegerStringConverter;
 import scriptstream.entities.User;
 import scriptstream.repositories.UserRepository;
 import scriptstream.util.EncryptionManager;
 
 import javax.crypto.KeyGenerator;
+import javax.inject.Inject;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
@@ -35,14 +38,12 @@ public class UserAuthLogic {
 
     private EncryptionManager encryptionManager;
 
-    private UserRepository userRepository = new UserRepository();
+    private UserRepository userRepository;
 
-    public UserAuthLogic(EncryptionManager encryptionManager) {
+    public UserAuthLogic(EncryptionManager encryptionManager, UserRepository userRepository) {
+        this.userRepository = userRepository;
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory()).setAudience(Collections.singletonList(CLIENT_ID)).build();
         this.encryptionManager = encryptionManager;
-
-        System.out.println("DEVELOPMENT TOKEN:");
-        System.out.println(issueToken("lol"));
     }
 
     public Pair<String, User> login(User user) {
@@ -51,12 +52,15 @@ public class UserAuthLogic {
             if(idToken.verify(verifier)) {
                 GoogleIdToken.Payload payload = idToken.getPayload();
                 user.name = (String) payload.get("name");
+                UUID uuid = UUID.nameUUIDFromBytes(payload.getSubject().getBytes());
+//                String uId = payload.getSubject();
+//                user.uuid = UUID.nameUUIDFromBytes(uId.getBytes());
+                user.uuid = uuid;
                 if(!userRepository.exists(user)){
-                    user.uuid = UUID.randomUUID();
                     userRepository.create(user);
                 }
 
-                return new Pair<>(issueToken(user.uuid.toString()), user);
+                return new Pair<>(issueToken(uuid.toString()), user);
             }
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
@@ -64,13 +68,13 @@ public class UserAuthLogic {
         return null;
     }
 
-    public User getUserByUUID(UUID uuid){
+    public User getUserByGToken(String gToken) {
         User user = new User();
-        user.uuid = uuid;
-        return this.userRepository.read(user);
+        user.gToken = gToken;
+        return userRepository.read(user);
     }
 
-    private String issueToken(String login) {
+    private String issueToken(String uuid) {
         try{
             Key key = encryptionManager.getEncryptionKey();
 
@@ -78,7 +82,7 @@ public class UserAuthLogic {
             Instant expiration = issuedAt.plus(15, ChronoUnit.MINUTES);
 
             return Jwts.builder()
-                    .setSubject(login)
+                    .setSubject(uuid)
                     .setIssuer(InetAddress.getLocalHost().toString())
                     .setIssuedAt(Date.from(issuedAt))
                     .setExpiration(Date.from(expiration))
