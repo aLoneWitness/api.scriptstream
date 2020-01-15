@@ -79,7 +79,7 @@ public class UserAuthLogic {
             Key key = encryptionManager.getEncryptionKey();
 
             Instant issuedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-            Instant expiration = issuedAt.plus(15, ChronoUnit.MINUTES);
+            Instant expiration = issuedAt.plus(9999, ChronoUnit.MINUTES);
 
             return Jwts.builder()
                     .setSubject(uuid)
