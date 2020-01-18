@@ -14,15 +14,17 @@ import java.util.stream.Collectors;
 public class MatchmakingLogic {
     private List<Project> projects = new ArrayList<>();
 
-    private int getMatchPercentage(Project project, User user){
-        int matchPercentage = 0;
+    private double getMatchPercentage(Project project, User user){
+        double matchPercentage = 0;
 
-        for (Skill skill : project.requiredSkills){
-            if(user.hasSkill(skill)){
-                matchPercentage = matchPercentage + (1 / user.skills.stream().filter(skill1 -> skill1.equals(skill)).findFirst().get().sPercentage) * 100 / project.requiredSkills.size();
+        for (Skill requiredSkill : project.requiredSkills){
+            if(!user.hasSkill(requiredSkill)) continue;
+            for (Skill userSkill: user.skills) {
+                if(userSkill.equals(requiredSkill)){
+                    matchPercentage += userSkill.sPercentage / project.requiredSkills.size();
+                }
             }
         }
-
         return matchPercentage;
     }
 
@@ -30,14 +32,10 @@ public class MatchmakingLogic {
         this.projects.add(project);
     }
 
-    public List<Project> getMatchedProjects(User user) {
-        return this.projects.stream().filter(project -> project.contributers.contains(user)).collect(Collectors.toList());
-    }
-
-    public Pair<Project, Integer> match(User user) {
-        Pair<Project, Integer> bestProjectForUser = new Pair<>(null, 0);
+    public Pair<Project, Double> match(User user) {
+        Pair<Project, Double> bestProjectForUser = new Pair<Project, Double>(null, 0.0);
         for (Project project: this.projects) {
-            int matchPercentage = getMatchPercentage(project, user);
+            double matchPercentage = getMatchPercentage(project, user);
             if(matchPercentage > bestProjectForUser.getValue()){
                 bestProjectForUser = new Pair<>(project, matchPercentage);
             }

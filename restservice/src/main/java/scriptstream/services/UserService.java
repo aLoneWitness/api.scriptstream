@@ -1,7 +1,8 @@
 package scriptstream.services;
 
 import com.google.gson.Gson;
-import org.apache.http.protocol.ResponseServer;
+import javafx.util.Pair;
+import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
 import scriptstream.filters.JWTTokenNeeded;
@@ -12,7 +13,6 @@ import scriptstream.logic.UserLogic;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,7 +36,6 @@ public class UserService {
     @JWTTokenNeeded
     public Response getProfile(@Context ContainerRequestContext context){
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-
         return Response.ok(gson.toJson(user)).build();
     }
 
@@ -64,6 +63,59 @@ public class UserService {
         return Response.notModified().build();
     }
 
+    @POST
+    @Path("createproject")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
+    public Response createProject(@Context ContainerRequestContext context, Project project) {
+        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        project.uuid = UUID.randomUUID();
+        if (userLogic.addNewProjectToUser(user, project)) {
+            return Response.accepted().build();
+        }
+        return Response.notModified().build();
+    }
+
+    @POST
+    @Path("removeproject")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
+    public Response removeProject(@Context ContainerRequestContext context, Project project) {
+        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        if(userLogic.removeProjectFromUser(user, project)){
+            return Response.accepted().build();
+        }
+        return Response.notModified().build();
+    }
+
+    @POST
+    @Path("leaveproject")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
+    public Response leaveProject(@Context ContainerRequestContext context, Project project) {
+        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        if(userLogic.leaveProjectFromUser(user, project)) {
+            return Response.accepted().build();
+        }
+        return Response.notModified().build();
+    }
+
+    @GET
+    @Path("getjoinedprojects")
+    @JWTTokenNeeded
+    public Response getJoinedProjects(@Context ContainerRequestContext context) {
+        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        return Response.ok(gson.toJson(user.joinedProjects)).build();
+    }
+
+    @GET
+    @Path("getownedprojects")
+    @JWTTokenNeeded
+    public Response getOwnedProjects(@Context ContainerRequestContext context) {
+        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        return Response.ok(gson.toJson(user.ownedProjects)).build();
+    }
+
     @GET
     @Path("getskills")
     @JWTTokenNeeded
@@ -78,14 +130,18 @@ public class UserService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response matchUser(@Context ContainerRequestContext context){
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        return Response.ok(gson.toJson(matchmakingLogic.match(user))).build();
+        Pair<Project, Double> match = matchmakingLogic.match(user);
+        if(userLogic.addProjectToUser(user, match.getKey())){
+            return Response.ok(gson.toJson(match.getKey())).build();
+        }
+        return Response.serverError().build();
     }
 
-    @GET
-    @Path("getprojects")
-    @JWTTokenNeeded
-    public Response getMatchedProjects(@Context ContainerRequestContext context){
-        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        return Response.ok(gson.toJson(matchmakingLogic.getMatchedProjects(user))).build();
-    }
+//    @GET
+//    @Path("getprojects")
+//    @JWTTokenNeeded
+//    public Response getMatchedProjects(@Context ContainerRequestContext context){
+//        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+//        return Response.ok(gson.toJson(matchmakingLogic.getMatchedProjects(user))).build();
+//    }
 }

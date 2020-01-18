@@ -9,7 +9,7 @@ import javax.persistence.Table;
 public class Skill {
     public int id;
     public String name;
-    public int sPercentage;
+    public double sPercentage;
 
     @Override
     public boolean equals(Object obj) {
