@@ -78,6 +78,29 @@ public class UserService {
     }
 
     @POST
+    @Path("toggleprojectprivacy")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
+    public Response togglePro(@Context ContainerRequestContext context, Project project) {
+        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+        if(user.ownedProjects.stream().anyMatch(project1 -> project1.equals(project))){
+            Project publicProject = user.ownedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
+            user.ownedProjects.remove(publicProject);
+            user.joinedProjects.add(publicProject);
+            return Response.accepted().build();
+        }
+        else if (user.joinedProjects.stream().anyMatch(project1 -> project1.equals(project))){
+            Project privateProject = user.joinedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
+            user.joinedProjects.remove(privateProject);
+            user.ownedProjects.add(privateProject);
+            return Response.accepted().build();
+        }
+        else {
+            return Response.notModified().build();
+        }
+    }
+
+    @POST
     @Path("removeproject")
     @Consumes(MediaType.APPLICATION_JSON)
     @JWTTokenNeeded
@@ -127,11 +150,12 @@ public class UserService {
 
     @POST
     @Path("match")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @JWTTokenNeeded
     public Response matchUser(@Context ContainerRequestContext context){
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
         Pair<Project, Double> match = matchmakingLogic.match(user);
+        if(match == null) return Response.notModified().build();
         if(userLogic.addProjectToUser(user, match.getKey())){
             return Response.ok(gson.toJson(match.getKey())).build();
         }

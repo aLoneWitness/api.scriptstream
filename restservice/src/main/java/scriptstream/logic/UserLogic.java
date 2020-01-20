@@ -21,6 +21,8 @@ public class UserLogic  {
     }
 
     public boolean addSkillToUser(User user, Skill skill){
+        if(skill.sPercentage > 100 || skill.sPercentage < 0) return false;
+        if(skill.name.isEmpty()) return false;
         user.skills.add(skill);
         this.userRepository.update(user);
         return true;
@@ -55,6 +57,4 @@ public class UserLogic  {
         this.userRepository.update(user);
         return true;
     }
-
-
 }
