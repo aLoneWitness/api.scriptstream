@@ -8,10 +8,7 @@ import scriptstream.filters.JWTTokenNeeded;
 import scriptstream.logic.UserAuthLogic;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.*;
 
@@ -51,7 +48,7 @@ public class AuthService {
         }
     }
 
-    @POST
+    @GET
     @Path("/verify")
     @JWTTokenNeeded
     public Response verify(@Context ContainerRequestContext containerRequestContext){
