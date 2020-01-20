@@ -1,21 +1,18 @@
 package scriptstream.entities;
 
-import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class Project {
-    @Getter
-    private User owner;
-    @Getter
-    private List<User> contributers;
-    @Getter
-    private List<Skill> requiredSkills;
-    @Getter
-    private UUID uuid = UUID.randomUUID();
+    public String name;
+    public UUID uuid;
+    public List<Skill> requiredSkills = new ArrayList<>();
 
-    public Project(User owner){
-        this.owner = owner;
+    @Override
+    public boolean equals(Object obj) {
+        Project proj = (Project) obj;
+        return proj.uuid.equals(this.uuid);
     }
 }

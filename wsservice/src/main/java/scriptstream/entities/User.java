@@ -1,12 +1,43 @@
 package scriptstream.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-
-@Getter @Setter
 public class User {
-    private int id;
-    private String name;
-    private String gToken;
+    public int id;
+    public UUID uuid;
+    public String name;
+    public String gToken;
+
+    public List<Project> ownedProjects = new ArrayList<>();
+    public List<Project> joinedProjects = new ArrayList<>();
+    public List<Skill> skills = new ArrayList<Skill>();
+
+    public boolean hasSkill(Skill skill){
+        for (Skill mySkill : this.skills){
+            if(mySkill.equals(skill)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isInProject(Project project) {
+        List<Project> projects = new ArrayList<>();
+        projects.addAll(ownedProjects);
+        projects.addAll(joinedProjects);
+        for (Project project1: projects) {
+            if(project.equals(project1)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        User usr = (User) obj;
+        return usr.uuid.equals(this.uuid);
+    }
 }

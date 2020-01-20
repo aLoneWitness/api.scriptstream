@@ -1,8 +1,6 @@
-package scriptstream.repositories;
+package scriptstream.logic.repositories.contexts;
 
-import java.util.UUID;
-
-public interface IRepository<T> {
+public interface IContext<T> {
     void create(T t);
     T read(T t);
     void update(T t);

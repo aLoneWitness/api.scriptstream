@@ -4,29 +4,19 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.DateTime;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import javafx.util.Pair;
-import javafx.util.converter.BigIntegerStringConverter;
 import scriptstream.entities.User;
-import scriptstream.repositories.UserRepository;
+import scriptstream.logic.repositories.UserRepository;
 import scriptstream.util.EncryptionManager;
 
-import javax.crypto.KeyGenerator;
-import javax.inject.Inject;
-import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
@@ -68,11 +58,11 @@ public class UserAuthLogic {
         return null;
     }
 
-    public User getUserByGToken(String gToken) {
-        User user = new User();
-        user.gToken = gToken;
-        return userRepository.read(user);
-    }
+//    public User getUserByGToken(String gToken) {
+//        User user = new User();
+//        user.gToken = gToken;
+//        return userRepository.read(user);
+//    }
 
     private String issueToken(String uuid) {
         try{

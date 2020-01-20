@@ -1,10 +1,13 @@
-package scriptstream.repositories;
+package scriptstream.logic.repositories.contexts.memory;
 
 import scriptstream.entities.User;
+import scriptstream.logic.repositories.contexts.IContext;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-public class UserRepository implements IRepository<User> {
+public class UserMemoryContext extends MemoryContext<User> {
     private Map<UUID, User> users = new HashMap<>();
 
     @Override

@@ -2,6 +2,7 @@ package scriptstream.networking;
 
 import com.google.gson.Gson;
 import okhttp3.*;
+import scriptstream.entities.Project;
 import scriptstream.entities.User;
 import scriptstream.logic.UserVerificationLogic;
 import scriptstream.networking.decoding.CodeStreamMessageDecoder;
@@ -25,30 +26,35 @@ public class CodeStreamEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("jwt") String jwt) throws IOException {
-
         User user = verificationLogic.getUser(jwt);
 
-
         UUID uuid = UUID.fromString(projectuuid);
+
+        Project project = new Project();
+        project.uuid = uuid;
+
+        if(!user.isInProject(project)){
+            session.close();
+            return;
+        }
+
         System.out.println(uuid);
-        if(projectSessions.containsKey(UUID.fromString(projectuuid))){
-            projectSessions.get(UUID.fromString(projectuuid)).add(session);
+        if(projectSessions.containsKey(uuid)){
+            projectSessions.get(uuid).add(session);
         }
         else{
             List<Session> sessions = new ArrayList<>();
             sessions.add(session);
-            projectSessions.put(UUID.fromString(projectuuid), sessions);
+            projectSessions.put(uuid, sessions);
         }
 
 
         users.put(session.getId(), user);
-
-
     }
 
     @OnMessage
     public void onMessage(Session session, CodeStreamMessage message, @PathParam("projectuuid") String projectuuid) throws IOException {
-        message.setFrom(users.get(session.getId()).getName());
+        message.setFrom(users.get(session.getId()).name);
         System.out.println(session.getId());
         projectSessions.get(UUID.fromString(projectuuid)).forEach(session1 -> {
             try {

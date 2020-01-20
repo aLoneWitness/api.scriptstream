@@ -6,6 +6,7 @@ import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
 import scriptstream.filters.JWTTokenNeeded;
+import scriptstream.logic.IMatchmakingLogic;
 import scriptstream.logic.MatchmakingLogic;
 import scriptstream.logic.UserAuthLogic;
 import scriptstream.logic.UserLogic;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @Path("user")
 public class UserService {
     @Inject
-    private MatchmakingLogic matchmakingLogic;
+    private IMatchmakingLogic matchmakingLogic;
 
     @Inject
     private UserAuthLogic userAuthLogic;

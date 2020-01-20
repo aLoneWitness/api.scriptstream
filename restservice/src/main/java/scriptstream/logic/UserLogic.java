@@ -3,7 +3,7 @@ package scriptstream.logic;
 import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
-import scriptstream.repositories.UserRepository;
+import scriptstream.logic.repositories.UserRepository;
 
 import java.util.UUID;
 

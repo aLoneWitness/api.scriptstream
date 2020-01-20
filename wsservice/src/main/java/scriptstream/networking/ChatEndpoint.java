@@ -1,6 +1,7 @@
 package scriptstream.networking;
 
 import com.google.gson.Gson;
+import scriptstream.entities.Project;
 import scriptstream.entities.User;
 import scriptstream.logic.UserVerificationLogic;
 import scriptstream.networking.decoding.ChatMessageDecoder;
@@ -22,29 +23,32 @@ public class ChatEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("projectuuid") String projectuuid, @PathParam("jwt") String jwt) throws IOException {
-        User user;
-        user = verificationLogic.getUser(jwt);
-
+        User user = verificationLogic.getUser(jwt);
 
         UUID uuid = UUID.fromString(projectuuid);
+        Project project = new Project();
+        project.uuid = uuid;
+        if(!user.isInProject(project)){
+            session.close();
+            return;
+        }
+
         System.out.println(uuid);
-        if(projectSessions.containsKey(UUID.fromString(projectuuid))){
-            projectSessions.get(UUID.fromString(projectuuid)).add(session);
+        if(projectSessions.containsKey(uuid)){
+            projectSessions.get(uuid).add(session);
         }
         else{
             List<Session> sessions = new ArrayList<>();
             sessions.add(session);
-            projectSessions.put(UUID.fromString(projectuuid), sessions);
+            projectSessions.put(uuid, sessions);
         }
-
-
 
         users.put(session.getId(), user);
 
         ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setFrom(user.getName());
+        chatMessage.setFrom(user.name);
         chatMessage.setContent("Connected!");
-        projectSessions.get(UUID.fromString(projectuuid)).forEach(session1 -> {
+        projectSessions.get(uuid).forEach(session1 -> {
             try {
                 session1.getBasicRemote().sendObject(chatMessage);
             } catch (IOException | EncodeException e) {
@@ -55,7 +59,7 @@ public class ChatEndpoint {
 
     @OnMessage
     public void onMessage(Session session, ChatMessage chatMessage, @PathParam("projectuuid") String projectuuid) throws IOException {
-        chatMessage.setFrom(users.get(session.getId()).getName());
+        chatMessage.setFrom(users.get(session.getId()).name);
         System.out.println(session.getId());
         projectSessions.get(UUID.fromString(projectuuid)).forEach(session1 -> {
             try {
