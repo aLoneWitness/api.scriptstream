@@ -34,6 +34,7 @@ public class MatchmakingLogicTests {
         compatProject.uuid = UUID.randomUUID();
         compatProject.name = "My Project";
         compatProject.requiredSkills.add(skill);
+        compatProject.owner = new User();
         user.skills.add(skill);
 
         Skill skill2 = new Skill();
@@ -43,6 +44,7 @@ public class MatchmakingLogicTests {
         incompatProject.uuid = UUID.randomUUID();
         incompatProject.name = "My Project";
         incompatProject.requiredSkills.add(skill2);
+        incompatProject.owner = new User();
 
         // Act
         matchmakingLogic.addProjectToPool(compatProject);
@@ -70,6 +72,7 @@ public class MatchmakingLogicTests {
         project.requiredSkills.add(python);
         project.requiredSkills.add(ML);
         project.name = "My Project";
+        project.owner = new User();
 
         User user = new User();
         user.uuid = UUID.randomUUID();
@@ -104,6 +107,7 @@ public class MatchmakingLogicTests {
         Project project = new Project();
         project.uuid = UUID.randomUUID();
         project.name = "myproject";
+        project.owner = new User();
         Skill skill = new Skill();
         skill.sPercentage = 99;
         skill.name = "Python";

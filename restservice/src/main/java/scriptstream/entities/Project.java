@@ -17,12 +17,12 @@ public class Project {
     public boolean isPublic;
 
     public User owner;
-    public List<User> contributors;
+    public List<User> contributors = new ArrayList<>();
 
     @Override
     public boolean equals(Object obj) {
         Project proj = (Project) obj;
-        if(proj.uuid == null) return false;
+        if(proj.uuid == null || this.uuid == null) return false;
         return proj.uuid.equals(this.uuid);
     }
 }

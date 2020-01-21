@@ -30,6 +30,7 @@ public class User {
     @Override
     public boolean equals(Object obj) {
         User usr = (User) obj;
+        if(this.uuid == null || usr.uuid == null) return false;
         return usr.uuid.equals(this.uuid);
     }
 }

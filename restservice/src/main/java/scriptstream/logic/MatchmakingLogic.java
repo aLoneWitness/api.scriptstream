@@ -25,7 +25,7 @@ public class MatchmakingLogic {
     }
 
     public boolean addProjectToPool(Project project) {
-        if(project == null || project.uuid == null || project.requiredSkills.isEmpty() || project.name.isEmpty()) return false;
+        if(project == null || project.uuid == null || project.requiredSkills.isEmpty() || project.name.isEmpty() || project.owner == null) return false;
         this.projects.add(project);
         return true;
     }

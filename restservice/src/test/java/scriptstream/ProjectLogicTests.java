@@ -4,12 +4,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
+import scriptstream.entities.User;
 import scriptstream.logic.ProjectLogic;
 import scriptstream.logic.UserLogic;
 import scriptstream.logic.repositories.ProjectRepository;
 import scriptstream.logic.repositories.UserRepository;
 import scriptstream.logic.repositories.contexts.memory.ProjectMemoryContext;
 import scriptstream.logic.repositories.contexts.memory.UserMemoryContext;
+
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProjectLogicTests {
@@ -69,5 +73,77 @@ public class ProjectLogicTests {
         boolean isRemoved = projectLogic.removeSkillFromProject(project, skill);
 
         assertTrue(isRemoved);
+    }
+
+    @Test
+    public void testValidContributorGetsAccepted() {
+        Project project = new Project();
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        user.name = "TestUser";
+
+        boolean isSucceeded = projectLogic.addContributor(project, user);
+
+        assertTrue(isSucceeded);
+    }
+
+    @Test
+    public void testContributorsCantGoOver7() {
+        Project project = new Project();
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        user.name = "TestUser";
+
+        User user2 = new User();
+        user2.uuid = UUID.randomUUID();
+        user2.name = "TestUser";
+
+        User user3 = new User();
+        user3.uuid = UUID.randomUUID();
+        user3.name = "TestUser";
+
+        User user4 = new User();
+        user4.uuid = UUID.randomUUID();
+        user4.name = "TestUser";
+
+        User user5 = new User();
+        user5.uuid = UUID.randomUUID();
+        user5.name = "TestUser";
+
+        User user6 = new User();
+        user6.uuid = UUID.randomUUID();
+        user6.name = "TestUser";
+
+        User user7 = new User();
+        user7.uuid = UUID.randomUUID();
+        user7.name = "TestUser";
+
+        User user8 = new User();
+        user8.uuid = UUID.randomUUID();
+        user8.name = "TestUser";
+
+        projectLogic.addContributor(project, user);
+        projectLogic.addContributor(project, user2);
+        projectLogic.addContributor(project, user3);
+        projectLogic.addContributor(project, user4);
+        projectLogic.addContributor(project, user5);
+        projectLogic.addContributor(project, user6);
+        projectLogic.addContributor(project, user7);
+        boolean overMaxReached = projectLogic.addContributor(project, user8);
+
+        assertFalse(overMaxReached);
+    }
+
+    @Test
+    public void testContributorsSameUsersAddedTwice() {
+        Project project = new Project();
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        user.name = "TestUser";
+
+        projectLogic.addContributor(project, user);
+        boolean isAdded = projectLogic.addContributor(project, user);
+
+        assertFalse(isAdded);
     }
 }
