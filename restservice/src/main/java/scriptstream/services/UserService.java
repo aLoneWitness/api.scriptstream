@@ -6,6 +6,7 @@ import scriptstream.entities.Skill;
 import scriptstream.entities.User;
 import scriptstream.filters.JWTTokenNeeded;
 import scriptstream.logic.MatchmakingLogic;
+import scriptstream.logic.ProjectLogic;
 import scriptstream.logic.UserLogic;
 
 import javax.inject.Inject;
@@ -24,6 +25,9 @@ public class UserService {
 
     @Inject
     private UserLogic userLogic;
+
+    @Inject
+    private ProjectLogic projectLogic;
 
     private final Gson gson = new Gson();
 
@@ -161,7 +165,10 @@ public class UserService {
         AbstractMap.SimpleEntry<Project, Double> match = matchmakingLogic.match(user);
         if(match == null) return Response.notModified().build();
         if(match.getKey() == null || match.getKey().equals(new Project())) return Response.notModified().build();
-        if(userLogic.addProjectToUser(user, match.getKey())){
+//        if(userLogic.addProjectToUser(user, match.getKey())){
+//            return Response.ok(gson.toJson(match.getKey())).build();
+//        }
+        if(projectLogic.addContributor(match.getKey(), user)){
             return Response.ok(gson.toJson(match.getKey())).build();
         }
         return Response.serverError().build();

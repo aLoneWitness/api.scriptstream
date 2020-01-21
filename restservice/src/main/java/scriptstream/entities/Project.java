@@ -16,6 +16,9 @@ public class Project {
     public String code;
     public boolean isPublic;
 
+    public User owner;
+    public List<User> contributors;
+
     @Override
     public boolean equals(Object obj) {
         Project proj = (Project) obj;

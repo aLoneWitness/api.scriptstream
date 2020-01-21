@@ -18,8 +18,8 @@ public class DIBinder extends AbstractBinder {
         UserAuthLogic userAuthLogic = new UserAuthLogic(encryptionManager, userRepository);
         ProjectRepository projectRepository = new ProjectRepository(new ProjectMemoryContext());
 
-        bind(new ProjectLogic(projectRepository)).to(ProjectLogic.class);
-        bind(new UserLogic(userRepository, projectRepository)).to(UserLogic.class);
+        bind(new ProjectLogic(projectRepository, userRepository)).to(ProjectLogic.class);
+        bind(new UserLogic(userRepository)).to(UserLogic.class);
         bind(userAuthLogic).to(UserAuthLogic.class);
         bind(new MatchmakingLogic()).to(MatchmakingLogic.class);
         bind(KeyGenerator.class).to(KeyGenerator.class);

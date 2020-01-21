@@ -17,7 +17,7 @@ public class ProjectLogicTests {
 
     @BeforeAll
     static public void beforeEach() {
-        projectLogic = new ProjectLogic(new ProjectRepository(new ProjectMemoryContext()));
+        projectLogic = new ProjectLogic(new ProjectRepository(new ProjectMemoryContext()), new UserRepository(new UserMemoryContext()));
     }
 
     @Test

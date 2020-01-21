@@ -15,6 +15,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Path("project")
@@ -37,7 +39,10 @@ public class ProjectService {
     public Response createProject(@Context ContainerRequestContext context, Project project) {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
         project.uuid = UUID.randomUUID();
-        if (userLogic.addNewProjectToUser(user, project)) {
+//        if (userLogic.addNewProjectToUser(user, project)) {
+//            return Response.accepted().build();
+//        }
+        if(projectLogic.createNewProject(project, user)){
             return Response.accepted().build();
         }
         return Response.notModified().build();
@@ -49,7 +54,10 @@ public class ProjectService {
     @JWTTokenNeeded
     public Response removeProject(@Context ContainerRequestContext context, Project project) {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        if(userLogic.removeProjectFromUser(user, project)){
+//        if(userLogic.removeProjectFromUser(user, project)){
+//            return Response.accepted().build();
+//        }
+        if(projectLogic.removeContributor(project, user)){
             return Response.accepted().build();
         }
         return Response.notModified().build();
@@ -63,15 +71,14 @@ public class ProjectService {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
         Project project = projectLogic.getProjectByUUID(UUID.fromString(projectuuid));
         // CONTAINS USES EQUALS IN BACKGROUND???
-        if(!user.ownedProjects.contains(project)){
+        if(!project.owner.equals(user)) {
             return Response.status(403).build();
         }
-        else{
-            if(projectLogic.addSkillToProject(project, skill)){
-                return Response.accepted().build();
-            }
-            return Response.status(422).build();
+
+        if(projectLogic.addSkillToProject(project, skill)){
+            return Response.accepted().build();
         }
+        return Response.status(422).build();
     }
 
     @POST
@@ -80,7 +87,10 @@ public class ProjectService {
     @JWTTokenNeeded
     public Response leaveProject(@Context ContainerRequestContext context, Project project) {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        if(userLogic.leaveProjectFromUser(user, project)) {
+//        if(userLogic.leaveProjectFromUser(user, project)) {
+//            return Response.accepted().build();
+//        }
+        if(projectLogic.removeContributor(project, user)){
             return Response.accepted().build();
         }
         return Response.notModified().build();
@@ -91,7 +101,11 @@ public class ProjectService {
     @JWTTokenNeeded
     public Response getJoinedProjects(@Context ContainerRequestContext context) {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        return Response.ok(gson.toJson(user.joinedProjects)).build();
+        List<Project> projects = new ArrayList<>();
+        for (UUID uuid: user.joinedProjects) {
+            projects.add(projectLogic.getProjectByUUID(uuid));
+        }
+        return Response.ok(gson.toJson(projects)).build();
     }
 
     @GET
@@ -99,7 +113,11 @@ public class ProjectService {
     @JWTTokenNeeded
     public Response getOwnedProjects(@Context ContainerRequestContext context) {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        return Response.ok(gson.toJson(user.ownedProjects)).build();
+        List<Project> projects = new ArrayList<>();
+        for (UUID uuid: user.ownedProjects) {
+            projects.add(projectLogic.getProjectByUUID(uuid));
+        }
+        return Response.ok(gson.toJson(projects)).build();
     }
 
     @POST
@@ -108,22 +126,26 @@ public class ProjectService {
     @JWTTokenNeeded
     public Response togglePrivacy(@Context ContainerRequestContext context, Project project) {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        if(user.ownedProjects.stream().anyMatch(project1 -> project1.equals(project))){
-            Project publicProject = user.ownedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
-            user.ownedProjects.remove(publicProject);
-            if(publicProject.isPublic){
-                publicProject.isPublic = false;
-                matchmakingLogic.removeProjectFromPool(publicProject);
-            }
-            else{
-                publicProject.isPublic = true;
-                matchmakingLogic.addProjectToPool(publicProject);
-            }
-            user.ownedProjects.add(publicProject);
+//        if(user.ownedProjects.stream().anyMatch(project1 -> project1.equals(project))){
+//            Project publicProject = user.ownedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
+//            user.ownedProjects.remove(publicProject);
+//            if(publicProject.isPublic){
+//                publicProject.isPublic = false;
+//                matchmakingLogic.removeProjectFromPool(publicProject);
+//            }
+//            else{
+//                publicProject.isPublic = true;
+//                matchmakingLogic.addProjectToPool(publicProject);
+//            }
+//            user.ownedProjects.add(publicProject);
+//            return Response.accepted().build();
+//        }
+//        else {
+//            return Response.notModified().build();
+//        }
+        if(projectLogic.togglePrivacy(project)){
             return Response.accepted().build();
         }
-        else {
-            return Response.notModified().build();
-        }
+        return Response.notModified().build();
     }
 }
