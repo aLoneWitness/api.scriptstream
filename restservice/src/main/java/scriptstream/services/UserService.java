@@ -1,7 +1,6 @@
 package scriptstream.services;
 
 import com.google.gson.Gson;
-import javafx.util.Pair;
 import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
@@ -15,6 +14,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.AbstractMap;
 import java.util.UUID;
 
 @Path("user")
@@ -158,7 +158,7 @@ public class UserService {
     @JWTTokenNeeded
     public Response matchUser(@Context ContainerRequestContext context){
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        Pair<Project, Double> match = matchmakingLogic.match(user);
+        AbstractMap.SimpleEntry<Project, Double> match = matchmakingLogic.match(user);
         if(match == null) return Response.notModified().build();
         if(match.getKey() == null || match.getKey().equals(new Project())) return Response.notModified().build();
         if(userLogic.addProjectToUser(user, match.getKey())){

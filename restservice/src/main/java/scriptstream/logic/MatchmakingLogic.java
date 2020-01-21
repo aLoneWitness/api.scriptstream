@@ -1,14 +1,10 @@
 package scriptstream.logic;
 
-import javafx.util.Pair;
 import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MatchmakingLogic {
@@ -42,14 +38,14 @@ public class MatchmakingLogic {
         return false;
     }
 
-    public Pair<Project, Double> match(User user) {
+    public AbstractMap.SimpleEntry<Project, Double> match(User user) {
         if(user == null || user.skills.isEmpty() || user.name.isEmpty() || user.uuid == null) return null;
 
-        Pair<Project, Double> bestProjectForUser = new Pair<Project, Double>(null, 0.0);
+        AbstractMap.SimpleEntry<Project, Double> bestProjectForUser = new AbstractMap.SimpleEntry<>(null, 0.0);
         for (Project project: this.projects) {
             double matchPercentage = getMatchPercentage(project, user);
             if(matchPercentage > bestProjectForUser.getValue()){
-                bestProjectForUser = new Pair<>(project, matchPercentage);
+                bestProjectForUser = new AbstractMap.SimpleEntry<>(project, matchPercentage);
             }
         }
 

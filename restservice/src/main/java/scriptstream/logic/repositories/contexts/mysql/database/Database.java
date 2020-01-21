@@ -1,10 +1,6 @@
 package scriptstream.logic.repositories.contexts.mysql.database;
 
-import javafx.util.Pair;
 import org.mariadb.jdbc.MariaDbDataSource;
-import scriptstream.entities.Project;
-import scriptstream.entities.Skill;
-import scriptstream.entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;

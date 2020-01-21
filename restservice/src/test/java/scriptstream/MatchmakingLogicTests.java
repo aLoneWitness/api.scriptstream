@@ -1,6 +1,5 @@
 package scriptstream;
 
-import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scriptstream.entities.Project;
@@ -8,6 +7,7 @@ import scriptstream.entities.Skill;
 import scriptstream.entities.User;
 import scriptstream.logic.MatchmakingLogic;
 
+import java.util.AbstractMap;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +48,7 @@ public class MatchmakingLogicTests {
         matchmakingLogic.addProjectToPool(compatProject);
         matchmakingLogic.addProjectToPool(incompatProject);
 
-        Pair<Project, Double> match = matchmakingLogic.match(user);
+        AbstractMap.SimpleEntry<Project, Double> match = matchmakingLogic.match(user);
 
         // Assert
         assertEquals(compatProject, match.getKey());
@@ -80,7 +80,7 @@ public class MatchmakingLogicTests {
         // Act
         matchmakingLogic.addProjectToPool(project);
 
-        Pair<Project, Double> match =  matchmakingLogic.match(user);
+        AbstractMap.SimpleEntry<Project, Double> match =  matchmakingLogic.match(user);
 
         // Assert
         assertEquals(40, match.getValue().intValue());

@@ -6,7 +6,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import javafx.util.Pair;
 import scriptstream.entities.User;
 import scriptstream.logic.repositories.UserRepository;
 import scriptstream.util.EncryptionManager;
@@ -18,6 +17,7 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class UserAuthLogic {
         this.encryptionManager = encryptionManager;
     }
 
-    public Pair<String, User> login(User user) {
+    public AbstractMap.SimpleEntry<String, User> login(User user) {
         try {
             GoogleIdToken idToken = verifier.verify(user.gToken);
             if(idToken.verify(verifier)) {
@@ -50,7 +50,7 @@ public class UserAuthLogic {
                     userRepository.create(user);
                 }
 
-                return new Pair<>(issueToken(uuid.toString()), user);
+                return new AbstractMap.SimpleEntry<>(issueToken(uuid.toString()), user);
             }
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
