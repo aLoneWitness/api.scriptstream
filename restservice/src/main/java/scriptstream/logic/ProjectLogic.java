@@ -52,6 +52,7 @@ public class ProjectLogic {
     }
 
     public boolean addContributor(Project project, User user) {
+        if(!project.isPublic) return false;
         if(user.uuid == null || user.name.isEmpty()) return false;
         if(project.contributors.contains(user)) return false;
         if(project.contributors.size() > 6) return false;
@@ -78,7 +79,7 @@ public class ProjectLogic {
     }
 
     public boolean createNewProject(Project project, User owner) {
-        if(owner.uuid == null || owner.name.isEmpty()) return false;
+        if(owner.uuid == null) return false;
         if(project.name.isEmpty()) return false;
         project.owner = owner;
         project.uuid = UUID.randomUUID();
@@ -91,7 +92,7 @@ public class ProjectLogic {
     }
 
     public boolean togglePrivacy(Project project) {
-        if(project.name.isEmpty() || project.uuid == null || project.owner == null) return false;
+        if(project.name.isEmpty() || project.uuid == null) return false;
         project.isPublic = !project.isPublic;
 
         projectRepository.update(project);

@@ -78,9 +78,13 @@ public class ProjectLogicTests {
     @Test
     public void testValidContributorGetsAccepted() {
         Project project = new Project();
+        project.name = "hi";
+        project.uuid = UUID.randomUUID();
         User user = new User();
         user.uuid = UUID.randomUUID();
         user.name = "TestUser";
+
+        projectLogic.togglePrivacy(project);
 
         boolean isSucceeded = projectLogic.addContributor(project, user);
 
@@ -145,5 +149,86 @@ public class ProjectLogicTests {
         boolean isAdded = projectLogic.addContributor(project, user);
 
         assertFalse(isAdded);
+    }
+
+    @Test
+    public void testDisbandProjectNormally() {
+        Project project = new Project();
+        project.name = "myproject";
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        projectLogic.createNewProject(project, user);
+        project = projectLogic.getProjectByUUID(user.ownedProjects.get(0));
+
+        boolean isDisbanded = projectLogic.disbandProject(project);
+
+        assertTrue(isDisbanded);
+    }
+
+    @Test
+    public void testRemoveContributorNormally() {
+        Project project = new Project();
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        user.name = "TestUser";
+
+        projectLogic.addContributor(project, user);
+        boolean isRemoved = projectLogic.removeContributor(project, user);
+
+        assertFalse(isRemoved);
+    }
+
+    @Test
+    public void testRemoveContributorWhoNeverJoined() {
+        Project project = new Project();
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        user.name = "TestUser";
+
+        boolean isRemoved = projectLogic.removeContributor(project, user);
+
+        assertFalse(isRemoved);
+    }
+
+    @Test
+    public void testTogglePrivacyJoinableWhenPublic() {
+        Project project = new Project();
+        project.name = "myproject";
+        project.uuid = UUID.randomUUID();
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        projectLogic.createNewProject(project, user);
+        project = projectLogic.getProjectByUUID(user.ownedProjects.get(0));
+
+
+        User joiner = new User();
+        joiner.uuid = UUID.randomUUID();
+        joiner.name = "JOiner";
+
+        projectLogic.togglePrivacy(project);
+        boolean isJoinable = projectLogic.addContributor(project, joiner);
+
+        assertTrue(isJoinable);
+    }
+
+    @Test
+    public void testTogglePrivacyUnjoinableWhenPrivate() {
+        Project project = new Project();
+        project.name = "myproject";
+        User user = new User();
+        user.uuid = UUID.randomUUID();
+        projectLogic.createNewProject(project, user);
+        project = projectLogic.getProjectByUUID(user.ownedProjects.get(0));
+
+
+        User joiner = new User();
+        joiner.uuid = UUID.randomUUID();
+        joiner.name = "JOiner";
+
+        projectLogic.togglePrivacy(project);
+        projectLogic.togglePrivacy(project);
+        boolean isJoinable = projectLogic.addContributor(project, user);
+
+        assertFalse(isJoinable);
     }
 }
