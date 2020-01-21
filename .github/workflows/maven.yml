@@ -15,7 +15,5 @@ jobs:
         java-version: 11
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: SonarQube Scan
-      uses: SonarSource/sonarcloud-github-action@v1.1
-      env:
-        SONAR_TOKEN: 9409f05c394a53c0508724d24c9d10c7b6f6241a
+    - name: Analyze in SonarQube
+      run: mvn verify sonar:sonar
