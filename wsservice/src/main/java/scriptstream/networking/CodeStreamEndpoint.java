@@ -33,7 +33,7 @@ public class CodeStreamEndpoint {
         Project project = new Project();
         project.uuid = uuid;
 
-        if(!user.ownedProjects.contains(project) && !user.joinedProjects.contains(project)){
+        if(!user.ownedProjects.contains(project.uuid) && !user.joinedProjects.contains(project.uuid)){
             session.close();
             return;
         }

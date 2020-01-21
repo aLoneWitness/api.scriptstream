@@ -144,8 +144,17 @@ public class ProjectService {
 //            return Response.notModified().build();
 //        }
         if(projectLogic.togglePrivacy(project)){
+            if(project.isPublic){
+                matchmakingLogic.addProjectToPool(project);
+            }
+            else{
+                matchmakingLogic.removeProjectFromPool(project);
+            }
             return Response.accepted().build();
         }
+
+
+
         return Response.notModified().build();
     }
 }

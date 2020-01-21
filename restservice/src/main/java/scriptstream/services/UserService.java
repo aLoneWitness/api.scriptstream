@@ -33,6 +33,7 @@ public class UserService {
 
     @GET
     @Path("getprofile")
+    @Produces(MediaType.APPLICATION_JSON)
     @JWTTokenNeeded
     public Response getProfile(@Context ContainerRequestContext context){
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
