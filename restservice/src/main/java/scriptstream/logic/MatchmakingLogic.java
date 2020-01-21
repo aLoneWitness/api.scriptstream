@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class MatchmakingLogic implements IMatchmakingLogic {
+public class MatchmakingLogic {
     private List<Project> projects = new ArrayList<>();
 
     private double getMatchPercentage(Project project, User user){
@@ -32,6 +32,13 @@ public class MatchmakingLogic implements IMatchmakingLogic {
         if(project == null || project.uuid == null || project.requiredSkills.isEmpty() || project.name.isEmpty()) return false;
         this.projects.add(project);
         return true;
+    }
+
+    public void removeProjectFromPool(Project project) {
+        if(this.projects.stream().anyMatch(project1 -> project1.equals(project))){
+            Project actual = this.projects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
+            this.projects.remove(actual);
+        }
     }
 
     public Pair<Project, Double> match(User user) {

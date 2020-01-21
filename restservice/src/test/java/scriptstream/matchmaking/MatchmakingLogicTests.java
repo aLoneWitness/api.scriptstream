@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
-import scriptstream.logic.IMatchmakingLogic;
 import scriptstream.logic.MatchmakingLogic;
 
 import java.util.UUID;
@@ -14,7 +13,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MatchmakingLogicTests {
-    private IMatchmakingLogic matchmakingLogic;
+    private MatchmakingLogic matchmakingLogic;
 
     @BeforeEach
     public void setUp() {

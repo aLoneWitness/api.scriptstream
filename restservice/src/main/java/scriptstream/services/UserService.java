@@ -6,9 +6,7 @@ import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
 import scriptstream.filters.JWTTokenNeeded;
-import scriptstream.logic.IMatchmakingLogic;
 import scriptstream.logic.MatchmakingLogic;
-import scriptstream.logic.UserAuthLogic;
 import scriptstream.logic.UserLogic;
 
 import javax.inject.Inject;
@@ -22,10 +20,7 @@ import java.util.UUID;
 @Path("user")
 public class UserService {
     @Inject
-    private IMatchmakingLogic matchmakingLogic;
-
-    @Inject
-    private UserAuthLogic userAuthLogic;
+    private MatchmakingLogic matchmakingLogic;
 
     @Inject
     private UserLogic userLogic;
@@ -64,81 +59,90 @@ public class UserService {
         return Response.notModified().build();
     }
 
-    @POST
-    @Path("createproject")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @JWTTokenNeeded
-    public Response createProject(@Context ContainerRequestContext context, Project project) {
-        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        project.uuid = UUID.randomUUID();
-        if (userLogic.addNewProjectToUser(user, project)) {
-            return Response.accepted().build();
-        }
-        return Response.notModified().build();
-    }
+// old project code
+//    @POST
+//    @Path("createproject")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @JWTTokenNeeded
+//    public Response createProject(@Context ContainerRequestContext context, Project project) {
+//        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+//        project.uuid = UUID.randomUUID();
+//        if (userLogic.addNewProjectToUser(user, project)) {
+//            return Response.accepted().build();
+//        }
+//        return Response.notModified().build();
+//    }
 
-    @POST
-    @Path("toggleprojectprivacy")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @JWTTokenNeeded
-    public Response togglePro(@Context ContainerRequestContext context, Project project) {
-        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        if(user.ownedProjects.stream().anyMatch(project1 -> project1.equals(project))){
-            Project publicProject = user.ownedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
-            user.ownedProjects.remove(publicProject);
-            user.joinedProjects.add(publicProject);
-            return Response.accepted().build();
-        }
-        else if (user.joinedProjects.stream().anyMatch(project1 -> project1.equals(project))){
-            Project privateProject = user.joinedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
-            user.joinedProjects.remove(privateProject);
-            user.ownedProjects.add(privateProject);
-            return Response.accepted().build();
-        }
-        else {
-            return Response.notModified().build();
-        }
-    }
+//    @POST
+//    @Path("toggleproject")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @JWTTokenNeeded
+//    public Response togglePrivacy(@Context ContainerRequestContext context, Project project) {
+//        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+//        if(user.ownedProjects.stream().anyMatch(project1 -> project1.equals(project))){
+//            Project publicProject = user.ownedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
+//            user.ownedProjects.remove(publicProject);
+//            if(publicProject.isPublic){
+//                publicProject.isPublic = false;
+//                matchmakingLogic.removeProjectFromPool(publicProject);
+//            }
+//            else{
+//                publicProject.isPublic = true;
+//                matchmakingLogic.addProjectToPool(publicProject);
+//            }
+//            user.ownedProjects.add(publicProject);
+//            return Response.accepted().build();
+//        }
+////        else if (user.joinedProjects.stream().anyMatch(project1 -> project1.equals(project))){
+////            Project privateProject = user.joinedProjects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
+////            user.joinedProjects.remove(privateProject);
+////            user.ownedProjects.add(privateProject);
+////            return Response.accepted().build();
+////        }
+//        else {
+//            return Response.notModified().build();
+//        }
+//    }
 
-    @POST
-    @Path("removeproject")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @JWTTokenNeeded
-    public Response removeProject(@Context ContainerRequestContext context, Project project) {
-        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        if(userLogic.removeProjectFromUser(user, project)){
-            return Response.accepted().build();
-        }
-        return Response.notModified().build();
-    }
+//    @POST
+//    @Path("removeproject")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @JWTTokenNeeded
+//    public Response removeProject(@Context ContainerRequestContext context, Project project) {
+//        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+//        if(userLogic.removeProjectFromUser(user, project)){
+//            return Response.accepted().build();
+//        }
+//        return Response.notModified().build();
+//    }
 
-    @POST
-    @Path("leaveproject")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @JWTTokenNeeded
-    public Response leaveProject(@Context ContainerRequestContext context, Project project) {
-        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        if(userLogic.leaveProjectFromUser(user, project)) {
-            return Response.accepted().build();
-        }
-        return Response.notModified().build();
-    }
+//    @POST
+//    @Path("leaveproject")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    @JWTTokenNeeded
+//    public Response leaveProject(@Context ContainerRequestContext context, Project project) {
+//        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+//        if(userLogic.leaveProjectFromUser(user, project)) {
+//            return Response.accepted().build();
+//        }
+//        return Response.notModified().build();
+//    }
 
-    @GET
-    @Path("getjoinedprojects")
-    @JWTTokenNeeded
-    public Response getJoinedProjects(@Context ContainerRequestContext context) {
-        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        return Response.ok(gson.toJson(user.joinedProjects)).build();
-    }
-
-    @GET
-    @Path("getownedprojects")
-    @JWTTokenNeeded
-    public Response getOwnedProjects(@Context ContainerRequestContext context) {
-        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
-        return Response.ok(gson.toJson(user.ownedProjects)).build();
-    }
+//    @GET
+//    @Path("getjoinedprojects")
+//    @JWTTokenNeeded
+//    public Response getJoinedProjects(@Context ContainerRequestContext context) {
+//        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+//        return Response.ok(gson.toJson(user.joinedProjects)).build();
+//    }
+//
+//    @GET
+//    @Path("getownedprojects")
+//    @JWTTokenNeeded
+//    public Response getOwnedProjects(@Context ContainerRequestContext context) {
+//        User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
+//        return Response.ok(gson.toJson(user.ownedProjects)).build();
+//    }
 
     @GET
     @Path("getskills")
@@ -156,6 +160,7 @@ public class UserService {
         User user = userLogic.getUserByUUID(UUID.fromString((String) context.getProperty("userId")));
         Pair<Project, Double> match = matchmakingLogic.match(user);
         if(match == null) return Response.notModified().build();
+        if(match.getKey() == null || match.getKey().equals(new Project())) return Response.notModified().build();
         if(userLogic.addProjectToUser(user, match.getKey())){
             return Response.ok(gson.toJson(match.getKey())).build();
         }

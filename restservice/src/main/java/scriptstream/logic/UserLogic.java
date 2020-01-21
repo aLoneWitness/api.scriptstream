@@ -3,15 +3,19 @@ package scriptstream.logic;
 import scriptstream.entities.Project;
 import scriptstream.entities.Skill;
 import scriptstream.entities.User;
+import scriptstream.logic.repositories.IRepository;
+import scriptstream.logic.repositories.ProjectRepository;
 import scriptstream.logic.repositories.UserRepository;
 
 import java.util.UUID;
 
 public class UserLogic  {
-    private UserRepository userRepository;
+    private IRepository<User> userRepository;
+    private IRepository<Project> projectRepository;
 
-    public UserLogic(UserRepository userRepository) {
+    public UserLogic(IRepository<User> userRepository, IRepository<Project> projectRepository) {
         this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
     }
 
     public User getUserByUUID(UUID uuid){
@@ -43,12 +47,14 @@ public class UserLogic  {
     public boolean addNewProjectToUser(User user, Project project) {
         user.ownedProjects.add(project);
         this.userRepository.update(user);
+        this.projectRepository.create(project);
         return true;
     }
 
     public boolean removeProjectFromUser(User user, Project project) {
         if(!user.ownedProjects.removeIf(project1 -> project1.equals(project))) return false;
         this.userRepository.update(user);
+        this.projectRepository.delete(project);
         return true;
     }
 

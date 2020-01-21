@@ -5,10 +5,8 @@ import scriptstream.logic.repositories.contexts.mysql.database.Database;
 import scriptstream.logic.repositories.contexts.mysql.database.DatabaseTable;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class MySQLContext<T> implements IContext<T> {
     Database database;
