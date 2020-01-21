@@ -33,12 +33,11 @@ public class CodeStreamEndpoint {
         Project project = new Project();
         project.uuid = uuid;
 
-        if(!user.isInProject(project)){
+        if(!user.ownedProjects.contains(project) && !user.joinedProjects.contains(project)){
             session.close();
             return;
         }
 
-        System.out.println(uuid);
         if(projectSessions.containsKey(uuid)){
             projectSessions.get(uuid).add(session);
         }
@@ -47,7 +46,6 @@ public class CodeStreamEndpoint {
             sessions.add(session);
             projectSessions.put(uuid, sessions);
         }
-
 
         users.put(session.getId(), user);
     }
@@ -67,7 +65,18 @@ public class CodeStreamEndpoint {
 
     @OnClose
     public void onClose(Session session, @PathParam("projectuuid") String projectuuid){
+        List<Session> sessions = projectSessions.get(UUID.fromString(projectuuid));
+        sessions.remove(session);
+        if(sessions.isEmpty()){
+            Project project = new Project();
+            project.code = "lol";
+            saveProject(project);
+        }
+
         projectSessions.get(UUID.fromString(projectuuid)).remove(session);
     }
 
+    private void saveProject(Project project){
+
+    }
 }

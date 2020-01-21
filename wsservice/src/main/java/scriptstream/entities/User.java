@@ -23,18 +23,6 @@ public class User {
         return false;
     }
 
-    public boolean isInProject(Project project) {
-        List<Project> projects = new ArrayList<>();
-        projects.addAll(ownedProjects);
-        projects.addAll(joinedProjects);
-        for (Project project1: projects) {
-            if(project.equals(project1)){
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public boolean equals(Object obj) {
         User usr = (User) obj;

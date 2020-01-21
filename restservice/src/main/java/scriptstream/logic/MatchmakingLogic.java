@@ -43,6 +43,7 @@ public class MatchmakingLogic {
 
         AbstractMap.SimpleEntry<Project, Double> bestProjectForUser = new AbstractMap.SimpleEntry<>(null, 0.0);
         for (Project project: this.projects) {
+            if(user.joinedProjects.contains(project) || user.ownedProjects.contains(project)) continue;
             double matchPercentage = getMatchPercentage(project, user);
             if(matchPercentage > bestProjectForUser.getValue()){
                 bestProjectForUser = new AbstractMap.SimpleEntry<>(project, matchPercentage);

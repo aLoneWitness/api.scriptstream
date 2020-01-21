@@ -28,10 +28,6 @@ public class ChatEndpoint {
         UUID uuid = UUID.fromString(projectuuid);
         Project project = new Project();
         project.uuid = uuid;
-        if(!user.isInProject(project)){
-            session.close();
-            return;
-        }
 
         System.out.println(uuid);
         if(projectSessions.containsKey(uuid)){
