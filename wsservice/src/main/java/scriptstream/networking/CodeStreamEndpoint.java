@@ -20,6 +20,7 @@ import java.util.*;
 public class CodeStreamEndpoint {
     private static Map<UUID, List<Session>> projectSessions = new HashMap<UUID, List<Session>>();
     private static HashMap<String, User> users = new HashMap<String, User>();
+    private static Map<UUID, String> code = new HashMap<>();
 
     private UserVerificationLogic verificationLogic = new UserVerificationLogic();
     private final Gson gson = new Gson();
@@ -48,10 +49,19 @@ public class CodeStreamEndpoint {
         }
 
         users.put(session.getId(), user);
+
+        try{
+            CodeStreamMessage message = new CodeStreamMessage();
+            message.setContent(code.get(uuid));
+            session.getBasicRemote().sendObject(message);
+        } catch (IOException | EncodeException e) {
+            e.printStackTrace();
+        }
     }
 
     @OnMessage
     public void onMessage(Session session, CodeStreamMessage message, @PathParam("projectuuid") String projectuuid) throws IOException {
+        code.put(UUID.fromString(projectuuid), message.getContent());
         message.setFrom(users.get(session.getId()).name);
         System.out.println(session.getId());
         projectSessions.get(UUID.fromString(projectuuid)).forEach(session1 -> {
