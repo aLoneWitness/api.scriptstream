@@ -34,11 +34,12 @@ public class MatchmakingLogic {
         return true;
     }
 
-    public void removeProjectFromPool(Project project) {
+    public boolean removeProjectFromPool(Project project) {
         if(this.projects.stream().anyMatch(project1 -> project1.equals(project))){
             Project actual = this.projects.stream().filter(project1 -> project1.equals(project)).findFirst().get();
-            this.projects.remove(actual);
+            return(this.projects.remove(actual));
         }
+        return false;
     }
 
     public Pair<Project, Double> match(User user) {

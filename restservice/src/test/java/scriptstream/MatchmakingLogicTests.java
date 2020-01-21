@@ -1,4 +1,4 @@
-package scriptstream.matchmaking;
+package scriptstream;
 
 import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,6 +96,46 @@ public class MatchmakingLogicTests {
 
         // Assert
         assertFalse(isAccepted);
+    }
+
+    @Test
+    public void testIfYouCanRemoveProjectsFromPool() {
+        // Arrange
+        Project project = new Project();
+        project.uuid = UUID.randomUUID();
+        project.name = "myproject";
+        Skill skill = new Skill();
+        skill.sPercentage = 99;
+        skill.name = "Python";
+        project.requiredSkills.add(skill);
+
+        // Act
+
+        matchmakingLogic.addProjectToPool(project);
+
+        boolean isRemoved = matchmakingLogic.removeProjectFromPool(project);
+
+        // Assert
+        assertTrue(isRemoved);
+    }
+
+    @Test
+    public void testIfYouCanRemoveNonExistantProjects() {
+        // Arrange
+        Project project = new Project();
+        project.uuid = UUID.randomUUID();
+        project.name = "myproject";
+        Skill skill = new Skill();
+        skill.sPercentage = 99;
+        skill.name = "Python";
+        project.requiredSkills.add(skill);
+
+        // Act
+
+        boolean isRemoved = matchmakingLogic.removeProjectFromPool(project);
+
+        // Assert
+        assertFalse(isRemoved);
     }
 
     @Test

@@ -39,12 +39,16 @@ public class UserLogic  {
     }
 
     public boolean addProjectToUser(User user, Project project) {
+        if(project.uuid == null) return false;
         user.joinedProjects.add(project);
         this.userRepository.update(user);
-        return true;
+        return projectRepository.exists(project);
     }
 
     public boolean addNewProjectToUser(User user, Project project) {
+        if (project.name.isEmpty() ) return false;
+        project.uuid = UUID.randomUUID();
+
         user.ownedProjects.add(project);
         this.userRepository.update(user);
         this.projectRepository.create(project);
