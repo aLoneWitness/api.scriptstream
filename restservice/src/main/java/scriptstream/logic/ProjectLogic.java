@@ -25,6 +25,7 @@ public class ProjectLogic {
     public boolean addSkillToProject(Project project, Skill skill) {
         if(skill.sPercentage > 100 || skill.sPercentage < 0) return false;
         if(skill.name.isEmpty()) return false;
+        if(project.requiredSkills.contains(skill)) return false;
         project.requiredSkills.add(skill);
         projectRepository.update(project);
         return true;
